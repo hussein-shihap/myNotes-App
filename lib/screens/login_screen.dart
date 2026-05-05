@@ -1,6 +1,30 @@
+import 'dart:math';
+import 'package:crypto/crypto.dart';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import ' register_screen.dart';
 import ' home_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; 
+
+Future<List<Map<String, dynamic>>> login(String email,String pass) async 
+{ 
+var result = await FirebaseFirestore.instance 
+.collection('Register') 
+.where('email', isEqualTo: email ).where('password', isEqualTo: hashPassword(pass)) 
+.get(); 
+return result.docs.map((doc) => doc.data()).toList(); 
+} 
+
+
+
+String hashPassword(String password) {
+  final bytes = utf8.encode(password);
+  final digest = sha256.convert(bytes);
+  return digest.toString();
+}
+
+
+
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -135,11 +159,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
 
-                      onPressed: () {
+                      onPressed: () async{
 
                         String email = emailController.text;
                         String password = passwordController.text;
-
+                          List<Map<String, dynamic>> users = await login(email, password);
                         if (email.isEmpty || password.isEmpty) {
 
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -149,12 +173,24 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           );
 
+                        }else if(users.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              backgroundColor: Colors.red,
+                              content: Text("Invalid email or password", style: TextStyle(color: Colors.white), ),
+                            ),
+                          );
+
+
+
+
                         } else {
 
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => HomeScreen(),
+                              builder: (_) => HomeScreen(email: 
+                              email),
                             ),
                           );
                         }

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1051741114316",
+    "project_id": "notesapp-deb81",
+    "storage_bucket": "notesapp-deb81.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1051741114316:android:721e3e7a1af33a3fb45769",
+        "android_client_info": {
+          "package_name": "com.example.notes_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAykXuok50Pf-c_EokAXKg0KwW4Yo4SOKw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

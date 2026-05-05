@@ -1,5 +1,28 @@
 import 'package:flutter/material.dart';
-import ' home_screen.dart';
+import ' home_screen.dart'; 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:crypto/crypto.dart';
+import 'dart:convert';
+Future<void> register(String em, String pas) async {
+  await FirebaseFirestore.instance.collection('Register').add({
+    'email': em,
+    'password': pas,
+  });
+}
+String hashPassword(String password) {
+  final bytes = utf8.encode(password);       
+  final digest = sha256.convert(bytes);     
+  return digest.toString();                  
+}
+Future<bool> found(String email, String pass) async {
+  var result = await FirebaseFirestore.instance
+      .collection('Register')
+      .where('email', isEqualTo: email)
+      .where('password', isEqualTo: pass)
+      .get();
+
+  return result.docs.isNotEmpty;
+}
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -23,29 +46,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
         backgroundColor: Colors.blue,
         elevation: 0,
         leading: Icon(Icons.notes, color: Colors.white),
-
         title: Row(
           children: [
             Icon(Icons.bolt, color: Colors.white, size: 18),
             SizedBox(width: 6),
-
-            Text(
-              "MyNotes",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-
+            Text("MyNotes",
+                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
             SizedBox(width: 6),
-
-            Text(
-              "App",
-              style: TextStyle(
-                color: Colors.white70,
-                fontSize: 14,
-              ),
-            ),
+            Text("App", style: TextStyle(color: Colors.white70, fontSize: 14)),
           ],
         ),
       ),
@@ -54,7 +62,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(20),
-
             child: Container(
               padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -148,8 +155,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ),
 
-                      onPressed: () {
-
+                      onPressed: () async { // ✅ async added
                         String email = emailController.text;
                         String password = passwordController.text;
                         String confirm = confirmController.text;
@@ -157,10 +163,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         // 1. check empty fields
                         if (email.isEmpty || password.isEmpty || confirm.isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
-
                             SnackBar(
-                                backgroundColor: Colors.red,
-                                content: Text("Please fill all fields",  style: TextStyle(color: Colors.white),)),
+                              backgroundColor: Colors.red,
+                              content: Text("Please fill all fields",
+                                  style: TextStyle(color: Colors.white)),
+                            ),
+                          );
+                        }else if(email.contains('@')==false||email.contains('.com')==false){
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              backgroundColor: Colors.red,
+                              content: Text("Please enter a valid email",
+                                  style: TextStyle(color: Colors.white)),
+                            ),
                           );
                         }
 
@@ -168,18 +183,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         else if (password != confirm) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                                backgroundColor: Colors.red,
-                                content: Text("Passwords do not match",style: TextStyle(color: Colors.white )   )),
+                              backgroundColor: Colors.red,
+                              content: Text("Passwords do not match",
+                                  style: TextStyle(color: Colors.white)),
+                            ),
                           );
                         }
 
-                        // 3. success
+                        // 3. check if email already registered
+                        else if (await found(email, password) == true) { // ✅ await added
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              backgroundColor: Colors.red,
+                              content: Text("Email already registered",
+                                  style: TextStyle(color: Colors.white)),
+                            ),
+                          );
+                        }
+
+                        // 4. register
                         else {
+                          await register(email, hashPassword( password)); // ✅ await added
                           Navigator.push(
                             context,
-                            MaterialPageRoute(
-                              builder: (_) => HomeScreen(),
-                            ),
+                            MaterialPageRoute(builder: (_) => HomeScreen(email: email)),
                           );
                         }
                       },
