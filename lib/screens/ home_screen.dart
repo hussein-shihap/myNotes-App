@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:notes_app/screens/ add_note_screen.dart';
 import 'package:notes_app/screens/edit_note_screen.dart';
+import 'package:notes_app/screens/login_screen.dart';
+
 
 Future<void> deleteNoteFromFirestore(String docId) async {
   await FirebaseFirestore.instance
@@ -40,6 +42,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: TextStyle(color: Colors.white70, fontSize: 14)),
           ],
         ),
+
+        actions: [
+          IconButton(
+            icon: Icon(Icons.logout, color: Colors.white),
+            onPressed: () {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => LoginScreen()),
+                    (route) => false,
+              );
+            },
+          ),
+        ],
       ),
 
       body: StreamBuilder<QuerySnapshot>(
