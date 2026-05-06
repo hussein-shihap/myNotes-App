@@ -147,6 +147,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   SizedBox(
                     width: double.infinity,
                     height: 50,
+
+
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
@@ -154,6 +156,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
+
 
                       onPressed: () async { // ✅ async added
                         String email = emailController.text;
@@ -191,7 +194,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         }
 
                         // 3. check if email already registered
-                        else if (await found(email, password) == true) { // ✅ await added
+                        else if (await found(email, password) == true) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               backgroundColor: Colors.red,
@@ -201,9 +204,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           );
                         }
 
-                        // 4. register
+
                         else {
-                          await register(email, hashPassword( password)); // ✅ await added
+                          await register(email, hashPassword( password));
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (_) => HomeScreen(email: email)),
